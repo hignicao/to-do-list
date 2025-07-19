@@ -35,8 +35,8 @@ export const getTasks = (params = {}) => {
 	return apiClient.get(`/tasks/?${query}`);
 };
 
-export const createTask = (title, description = "") => {
-	return apiClient.post("/tasks/", { title, description });
+export const createTask = (taskData) => {
+	return apiClient.post("/tasks/", taskData);
 };
 
 export const updateTask = (taskId, data) => {

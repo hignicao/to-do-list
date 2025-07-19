@@ -8,6 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 function DashboardPage() {
 	const [tasks, setTasks] = useState([]);
 	const [newTaskTitle, setNewTaskTitle] = useState("");
+	const [newTaskDescription, setNewTaskDescription] = useState("");
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 
@@ -43,8 +44,9 @@ function DashboardPage() {
 	const handleCreateTask = async (e) => {
 		e.preventDefault();
 		if (!newTaskTitle.trim()) return;
-		await createTask(newTaskTitle);
+		await createTask({ title: newTaskTitle, description: newTaskDescription });
 		setNewTaskTitle("");
+		setNewTaskDescription("");
 		await fetchTasks();
 	};
 
@@ -81,15 +83,18 @@ function DashboardPage() {
 			</AppBar>
 
 			<Container maxWidth="md" sx={{ mt: 4 }}>
-				<Box component="form" onSubmit={handleCreateTask} sx={{ display: "flex", gap: 2, mb: 4 }}>
-					<TextField fullWidth variant="outlined" label="Adicionar nova tarefa..." value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} />
-					<Button type="submit" variant="contained" size="large">
+				<Box component="form" onSubmit={handleCreateTask} sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}>
+					<TextField fullWidth variant="outlined" label="Título da tarefa..." value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} />
+					<TextField fullWidth variant="outlined" label="Descrição (opcional)..." value={newTaskDescription} onChange={(e) => setNewTaskDescription(e.target.value)} multiline rows={2} />
+					<Button type="submit" variant="contained" size="large" sx={{ alignSelf: "flex-end" }}>
 						Adicionar
 					</Button>
 				</Box>
 
 				<Stack direction="row" spacing={1} display="flex" justifyContent="center" sx={{ mb: 2 }}>
-					<Typography display="flex" justifyContent="center" alignItems={"center"}>Filtros:</Typography>
+					<Typography display="flex" justifyContent="center" alignItems={"center"}>
+						Filtros:
+					</Typography>
 					<Button variant={Object.keys(filter).length === 0 ? "contained" : "outlined"} onClick={() => handleFilterChange({})}>
 						Todas
 					</Button>
@@ -120,7 +125,7 @@ function DashboardPage() {
 											}
 										>
 											<Checkbox edge="start" checked={task.completed} tabIndex={-1} disableRipple onChange={() => handleToggleComplete(task)} />
-											<ListItemText primary={task.title} sx={{ textDecoration: task.completed ? "line-through" : "none" }} />
+											<ListItemText primary={task.title} secondary={task.description || null} sx={{ textDecoration: task.completed ? "line-through" : "none" }} />
 										</ListItem>
 									))
 								) : (
