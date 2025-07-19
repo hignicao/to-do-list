@@ -8,7 +8,16 @@ Uma aplicação web full-stack de gerenciamento de tarefas (To-Do List) com aute
 
 Este projeto foi desenvolvido como parte de um processo seletivo. O objetivo foi criar uma API REST com Django REST Framework e um frontend com React, seguindo as melhores práticas de desenvolvimento.
 
-![Prévia da Dashboard da Aplicação](./github/assets/dashboard-preview.png) ![Prévia da Dashboard da Aplicação em Mobile](./github/assets/dashboard-preview-mobile.png)
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="./.github/assets/dashboard-preview.png" alt="Preview da versão web da aplicação" width="550">
+    </td>
+    <td align="center">
+      <img src="./.github/assets/dashboard-preview-mobile.png" alt="Preview da versão mobile da aplicação" width="139">
+    </td>
+  </tr>
+</table>
 
 ## Funcionalidades
 
