@@ -24,8 +24,8 @@ export const login = async (username, password) => {
     return response.data;
 };
 
-export const register = (username, password) => {
-    return apiClient.post('/auth/register/', { username, password });
+export const register = (userData) => {
+    return apiClient.post('/auth/register/', userData);
 };
 
 

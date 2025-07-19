@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/api';
 
 function LoginPage() {
@@ -43,6 +43,7 @@ function LoginPage() {
                 </div>
                 <button type="submit">Entrar</button>
             </form>
+            <p>Não tem uma conta? <Link to="/register">Cadastre-se</Link></p>
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );

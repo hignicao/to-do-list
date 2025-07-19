@@ -8,10 +8,21 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const [filter, setFilter] = useState({});
+    const [pagination, setPagination] = useState({ count: 0, next: null, previous: null });
+    const [currentPage, setCurrentPage] = useState(1);
+
     const fetchTasks = useCallback(async () => {
+        setLoading(true);
         try {
-            const response = await getTasks();
+            const params = { ...filter, page: currentPage };
+            const response = await getTasks(params);
             setTasks(response.data.results);
+            setPagination({
+                count: response.data.count,
+                next: response.data.next,
+                previous: response.data.previous
+            });
         } catch (error) {
             console.error("Sessão inválida. Redirecionando para login.");
             localStorage.removeItem('authToken');
@@ -19,49 +30,43 @@ function DashboardPage() {
         } finally {
             setLoading(false);
         }
-    }, [navigate]);
+    }, [navigate, filter, currentPage]);
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (!token) {
             navigate('/');
-            return;
+        } else {
+            fetchTasks();
         }
-        fetchTasks();
     }, [fetchTasks, navigate]);
 
     const handleCreateTask = async (e) => {
         e.preventDefault();
         if (!newTaskTitle.trim()) return;
-            await createTask(newTaskTitle);
-            setNewTaskTitle('');
-            fetchTasks();
-        } catch (error) {
-            console.error("Erro ao criar tarefa:", error);
-        }
+        await createTask(newTaskTitle);
+        setNewTaskTitle('');
+        fetchTasks();
     };
 
     const handleToggleComplete = async (task) => {
-        try {
-            await updateTask(task.id, { completed: !task.completed });
-            fetchTasks();
-        } catch (error) {
-            console.error("Erro ao atualizar tarefa:", error);
-        }
+        await updateTask(task.id, { completed: !task.completed });
+        fetchTasks();
     };
 
     const handleDeleteTask = async (taskId) => {
-        try {
-            await deleteTask(taskId);
-            fetchTasks();
-        } catch (error) {
-            console.error("Erro ao deletar tarefa:", error);
-        }
+        await deleteTask(taskId);
+        fetchTasks();
     };
 
-    if (loading) {
-        return <p>Carregando...</p>;
-    }
+    const handleFilterChange = (newFilter) => {
+        setCurrentPage(1);
+        setFilter(newFilter);
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     return (
         <div>
@@ -77,25 +82,35 @@ function DashboardPage() {
                 <button type="submit">Adicionar</button>
             </form>
 
-            <ul>
-                {tasks.length > 0 ? (
-                    tasks.map(task => (
+            <div>
+                <button onClick={() => handleFilterChange({})}>Todas</button>
+                <button onClick={() => handleFilterChange({ completed: 'false' })}>Pendentes</button>
+                <button onClick={() => handleFilterChange({ completed: 'true' })}>Concluídas</button>
+            </div>
+
+            {loading ? <p>Carregando...</p> : (
+                <ul>
+                    {tasks.map(task => (
                         <li key={task.id} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-                            <input
-                                type="checkbox"
-                                checked={task.completed}
-                                onChange={() => handleToggleComplete(task)}
-                            />
+                            <input type="checkbox" checked={task.completed} onChange={() => handleToggleComplete(task)} />
                             {task.title}
-                            <button onClick={() => handleDeleteTask(task.id)} style={{ marginLeft: '10px' }}>
-                                Excluir
-                            </button>
+                            <button onClick={() => handleDeleteTask(task.id)} style={{ marginLeft: '10px' }}>Excluir</button>
                         </li>
-                    ))
-                ) : (
-                    <p>Você ainda não tem tarefas. Adicione uma!</p>
-                )}
-            </ul>
+                    ))}
+                </ul>
+            )}
+             {tasks.length === 0 && !loading && <p>Nenhuma tarefa encontrada.</p>}
+
+
+            <div>
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={!pagination.previous}>
+                    Anterior
+                </button>
+                <span>Página {currentPage}</span>
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={!pagination.next}>
+                    Próxima
+                </button>
+            </div>
         </div>
     );
 }
